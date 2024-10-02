@@ -2,7 +2,7 @@
   <div class="pokemon-card" :style="{ backgroundColor: bgColor }">
     <div class="card-header">
       <span class="pokemon-name">{{ pokeName }}</span>
-      <span class="pokemon-number">{{ pokeId }}</span>
+      <span class="pokemon-number"> # {{ pokeId }}</span>
     </div>
     <div class="pokemon-types">
       <span 
@@ -43,7 +43,7 @@ export default defineComponent({
     },
     type02: {
       type: String,
-      default: null
+      default: undefined
     },
     pokeImg: {
       type: String,

@@ -38,8 +38,11 @@
                 <div class="headerHabilidades">
                     <h2>Habilidades</h2>
                 </div>
-                <div v-for="(habilidade, index) in habilidadeList" :key="index">
-                    <h3>Name: {{ habilidade.name }} </h3>
+                <div class="moves">
+
+                    <div v-for="(habilidade, index) in habilidadeList" :key="index">
+                        <h3>Name: {{ habilidade.name }} </h3>
+                    </div>
                 </div>
             </div>
 
@@ -112,10 +115,11 @@ interface Habilidade {
     name: string;
 }
 
-interface Evolution {
-    species: { name: string; url: string };
-    evolves_to: Evolution[];
-}
+// interface Evolution {
+//     species: { name: string; url: string };
+//     evolves_to: Evolution[];
+//     evolution_details: {min_level: number; item: string};
+// }
 
 export default defineComponent({
     components: { PokemonCard },
@@ -200,8 +204,7 @@ export default defineComponent({
                     { label: 'Defesa Especial', value: response.data.stats[4].base_stat },
                     { label: 'Velocidade', value: response.data.stats[5].base_stat }
                 ];
-
-                this.habilidadeList = response.data.abilities.map((el: any) => el.ability);
+                this.habilidadeList = response.data.moves.map((el: any) => el.move);
             } catch (error) {
                 console.error("Erro ao buscar detalhes do Pokémon:", error);
             }
@@ -232,13 +235,13 @@ export default defineComponent({
                 const evolutionUrl = resp.data.evolution_chain.url;
                 const response = await axios.get(evolutionUrl);
 
-                const chain = response.data.chain as Evolution;
+                const chain = response.data.chain 
 
                 this.fristEvolutionName = chain.species.name;
                 this.fristEvolutionId = chain.species.url.split('/').filter(Boolean).pop() || '';
                 this.fristEvolutionImg = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${this.fristEvolutionId}.png`;
 
-                if (!chain.evolves_to.length) {
+                if (chain.evolves_to.length === 0) {
                     this.secondDisable = false;
                     this.thirdDisable = false;
                     return;
@@ -246,25 +249,28 @@ export default defineComponent({
 
                 const secondEvolution = chain.evolves_to[0];
                 this.secondEvolutionName = secondEvolution.species.name;
-                this.secondEvolutionLvl = secondEvolution.evolution_details[0]?.min_level || null;
+
+                this.secondEvolutionLvl = secondEvolution.evolution_details[0]?.min_level || null; 
+
                 this.secondEvolutionId = secondEvolution.species.url.split('/').filter(Boolean).pop() || '';
                 this.secondEvolutionImg = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${this.secondEvolutionId}.png`;
 
-                if (!secondEvolution.evolves_to.length) {
-                    this.thirdDisable = false;
-                    return;
-                }
+             
 
                 const thirdEvolution = secondEvolution.evolves_to[0];
                 this.thirdEvolutionName = thirdEvolution.species.name;
                 this.thirdEvolutionId = thirdEvolution.species.url.split('/').filter(Boolean).pop() || '';
                 this.thirdEvolutionImg = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${this.thirdEvolutionId}.png`;
-                this.thirdEvolutionLvl = thirdEvolution.evolution_details[0]?.min_level || null;
-                this.thirdEvolutionItem = thirdEvolution.evolution_details[0]?.item?.name || null;
 
-                if (!this.thirdEvolutionLvl) {
-                    this.itemDisable = true;
+                this.thirdEvolutionLvl =thirdEvolution.evolution_details.map((el: { min_level: number }) => el.min_level)[0];
+
+
+                if (this.thirdEvolutionLvl === null) {
+                    this.thirdEvolutionItem = thirdEvolution.evolution_details.map((el: { item: { name: string } }) => el.item.name)[0];
+                    this.itemDisable = true
+                    this.lvlDisable = false
                 }
+
             } catch (error) {
                 console.error("Erro ao exibir as evoluções", error);
             }
@@ -406,6 +412,13 @@ export default defineComponent({
     flex-direction: column;
     align-items: center;
     margin-bottom: 15px;
+
+}
+
+.moves {
+    height: 300px;
+    overflow: auto;
+    /* Adiciona barras de rolagem quando necessário */
 }
 
 .headerEvo {

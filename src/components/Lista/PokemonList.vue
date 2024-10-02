@@ -1,5 +1,5 @@
 <template>
-    <div class="container">
+    <div  :class="['container', { 'single-result': pokemonList.length === 1 }]">
       <img class="logo" src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/International_Pok%C3%A9mon_logo.svg/640px-International_Pok%C3%A9mon_logo.svg.png" alt="logo">
       <span class="subTitle">Faça sua pesquisa, pelo Id, Nome e Tipo </span>
       <input class="input" type="text" placeholder="Pesquisar!!" v-model="pokemonSearch" @keyup.enter="pokeSearchList()">
@@ -7,7 +7,7 @@
         <div v-for="item in pokemonList" :key="item.id">
           <PokemonCard 
             :pokeName="item.name" 
-            :pokeId="'#' + item.id" 
+            :pokeId=" item.id" 
             :type01="item.type01" 
             :type02="item.type02" 
             :typeColors="typeColors" 
@@ -35,8 +35,8 @@
     name: string;
     id: number;
     pokeImg: string;
-    type01: string;
-    type02?: string | null;
+    type01: string | any;
+    type02?: string | undefined;
     totalinfos: any;
   }
   
@@ -48,7 +48,8 @@
         pokemonSearch: '',
         offset: 0,
         limit: 20,
-        disabledPag: true,
+        disabledPag: true ,
+        currentPage: 1 as number,
         typeColors: {
           fire: '#F08030',
           water: '#6890F0',
@@ -74,6 +75,7 @@
     methods: {
       async pokeSearchList(): Promise<void> {
         this.pokemonList = [];
+        this.disabledPag = true;
         try {
           if (this.pokemonSearch === '') {
             const response = await axios.get(`https://pokeapi.co/api/v2/pokemon?limit=${this.limit}&offset=${this.offset}`);
@@ -121,7 +123,8 @@
               this.disabledPag = false;
             }
           }
-          this.currentPage = 1; // Resetando a página para 1 após a busca
+          this.currentPage  = 1; // Resetando a página para 1 após a busca
+
         } catch (error) {
           console.error('Erro ao buscar Pokemon', error);
         }
@@ -157,6 +160,13 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+  }
+  .container.single-result {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
   }
   
   .logo {

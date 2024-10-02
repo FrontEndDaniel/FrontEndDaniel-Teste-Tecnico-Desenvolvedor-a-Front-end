@@ -1,0 +1,1 @@
+{"root":["./src/main.ts","./src/router.ts","./src/vite-env.d.ts","./src/stores/pokemonstore.ts","./src/app.vue","./src/components/card/pokemoncard.vue","./src/components/detalhes/pokemondetail.vue","./src/components/lista/pokemonlist.vue"],"version":"5.6.2"}
